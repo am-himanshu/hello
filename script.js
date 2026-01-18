@@ -1,29 +1,30 @@
-document.getElementById("helloBtn").addEventListener("click", () => {
-    if (!navigator.geolocation) {
-        alert("Geolocation not supported");
-        return;
-    }
+function getLocation() {
+  if (!navigator.geolocation) {
+    alert("Geolocation not supported by your browser");
+    return;
+  }
 
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-
-            const message = `📍 My Location:
-Latitude: ${lat}
-Longitude: ${lon}
-🗺️ Map: https://www.google.com/maps?q=${lat},${lon}`;
-
-            const phoneNumber = "919235951295"; 
-            // replace with your WhatsApp number (country code, no +)
-
-            const whatsappURL =
-                `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-
-            window.open(whatsappURL, "_blank");
+  navigator.geolocation.getCurrentPosition(
+    function (position) {
+      fetch("http://localhost:3000/location", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
         },
-        () => {
-            alert("Location permission denied");
-        }
-    );
-});
+        body: JSON.stringify({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        })
+      })
+      .then(() => {
+        alert("Location sent successfully!");
+      })
+      .catch(() => {
+        alert("Error sending location");
+      });
+    },
+    function () {
+      alert("Location permission denied");
+    }
+  );
+}
